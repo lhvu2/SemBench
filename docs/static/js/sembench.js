@@ -12,6 +12,7 @@ let currentVersion = null; // Selected version for interactive table
 let currentPerformanceVersion = null; // Selected version for performance comparison
 let currentScenario = null; // Selected scenario
 let currentModel = null; // Selected model
+let currentScale = null; // Selected scale factor (null = default/no scale)
 let systemsData = {};
 let coverageData = null; // Coverage data for current scenario
 let colorblindMode = false; // Colorblind-friendly mode toggle
@@ -25,7 +26,8 @@ let scenarioData = {
             '2.5flash': 'Gemini 2.5 Flash',
             '5mini': 'GPT-5 Mini'
         },
-        'pathPrefix': 'across_system_' // animals uses across_system_ without 's'
+        'pathPrefix': 'across_system_', // animals uses across_system_ without 's'
+        'scaleFactors': [100, 200, 400, 800, 1600]
     },
     'movie': {
         'models': ['2.0flash', '2.5flash', '4omini', '5mini'],
@@ -35,16 +37,8 @@ let scenarioData = {
             '4omini': 'GPT-4o Mini',
             '5mini': 'GPT-5 Mini'
         },
-        'pathPrefix': 'across_system_' // movie uses across_system_ without 's'
-    },
-    'medical': {
-        'models': ['2.5flash', '2.5pro', '5mini'],
-        'modelNames': {
-            '2.5flash': 'Gemini 2.5 Flash',
-            '2.5pro': 'Gemini 2.5 Pro',
-            '5mini': 'GPT-5 Mini'
-        },
-        'pathPrefix': 'across_system_' // movie uses across_system_ without 's'
+        'pathPrefix': 'across_system_', // movie uses across_system_ without 's'
+        'scaleFactors': [1000, 2000, 4000, 8000, 16000]
     },
     'ecomm': {
         'models': ['2.5flash', '2.5flashlite', '2.5pro', '4o', '4omini'],
@@ -56,7 +50,8 @@ let scenarioData = {
             '4omini': 'GPT-4o Mini'
         },
         'pathPrefix': 'across_system_',
-        'queries': ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q14'] // E-commerce has 14 queries
+        'queries': ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q14'], // E-commerce has 14 queries
+        'scaleFactors': [250, 500, 1000, 2000, 4000]
     },
     'mmqa': {
         'models': ['gemini-2.5-flash'],
@@ -64,7 +59,16 @@ let scenarioData = {
             'gemini-2.5-flash': 'Gemini 2.5 Flash'
         },
         'pathPrefix': 'across_system_', // mmqa uses across_system_ without 's'
-        'queries': ['Q1', 'Q2a', 'Q2b', 'Q3a', 'Q3f', 'Q4', 'Q5', 'Q6a', 'Q6b', 'Q6c', 'Q7'] // Custom query list for MMQA
+        'queries': ['Q1', 'Q2a', 'Q2b', 'Q3a', 'Q3f', 'Q4', 'Q5', 'Q6a', 'Q6b', 'Q6c', 'Q7'], // Custom query list for MMQA
+        'scaleFactors': [100, 200, 400, 800],
+        'scaleModelName': '2.5flash' // Scale folders use 2.5flash instead of gemini-2.5-flash
+    },
+    'cars': {
+        'models': ['2.5flash'],
+        'modelNames': { '2.5flash': 'Gemini 2.5 Flash' },
+        'pathPrefix': 'across_system_',
+        'queries': ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10'],
+        'scaleFactors': [9836, 19672, 39344, 78688, 157376]
     }
 };
 
@@ -75,6 +79,7 @@ function init() {
     $('#scenarioSelect').change(onScenarioChange);
     $('#modelSelect').change(onModelChange);
     $('#colorblindToggle').change(onColorblindToggleChange);
+    $('#scaleSelect').change(onScaleChange);
 
     // Set up query link clicks
     $(document).on('click', '.query-link', onQueryClick);
@@ -152,6 +157,7 @@ async function loadAvailableVersions() {
             $('#scenarioSelect').prop('disabled', false).val(currentScenario);
             populateModelSelect();
             $('#modelSelect').prop('disabled', false).val(currentModel);
+            populateScaleSelect();
 
             // Load the data immediately
             loadBenchmarkData();
@@ -182,6 +188,7 @@ function enableLegacyMode() {
     $('#scenarioSelect').val(currentScenario);
     populateModelSelect();
     $('#modelSelect').prop('disabled', false).val(currentModel);
+    populateScaleSelect();
     loadBenchmarkData();
 }
 
@@ -196,8 +203,10 @@ function onVersionChange() {
         // Reset dependent selections
         currentScenario = null;
         currentModel = null;
+        currentScale = null;
         $('#scenarioSelect').val('');
         $('#modelSelect').prop('disabled', true).html('<option value="">Select Model</option>');
+        $('#scaleSelect').prop('disabled', true).html('<option value="">Scale (Default)</option>');
 
         // Hide table and other sections
         $('#benchmarkTable').hide();
@@ -229,6 +238,10 @@ function onScenarioChange() {
         // Enable model select and populate it
         populateModelSelect();
         $('#modelSelect').prop('disabled', false);
+
+        // Populate scale select and reset
+        populateScaleSelect();
+        currentScale = null;
 
         // Auto-select default model based on scenario
         const availableModels = scenarioData[currentScenario].models;
@@ -290,6 +303,31 @@ function onModelChange() {
         $('#benchmarkTable').hide();
         $('#queryDetails').hide();
         $('#overallPerformance').hide();
+    }
+}
+
+function onScaleChange() {
+    const val = $('#scaleSelect').val();
+    currentScale = val ? val : null;
+    console.log('Scale changed to:', currentScale);
+
+    if (currentModel && currentScenario && currentVersion) {
+        loadBenchmarkData();
+    }
+}
+
+function populateScaleSelect() {
+    const scaleSelect = $('#scaleSelect');
+    scaleSelect.html('<option value="">Scale (Default)</option>');
+
+    if (scenarioData[currentScenario] && scenarioData[currentScenario].scaleFactors) {
+        const factors = scenarioData[currentScenario].scaleFactors;
+        factors.forEach(sf => {
+            scaleSelect.append(`<option value="${sf}">${sf}</option>`);
+        });
+        scaleSelect.prop('disabled', false);
+    } else {
+        scaleSelect.prop('disabled', true);
     }
 }
 
@@ -396,7 +434,10 @@ async function loadMultipleRounds() {
     
     // Check for rounds 1-5
     for (let round = 1; round <= 5; round++) {
-        const roundFolder = `${pathPrefix}${currentModel}_${round}`;
+        const scaleModel = scenarioData[currentScenario].scaleModelName || currentModel;
+        const roundFolder = currentScale
+            ? `${pathPrefix}${scaleModel}_sf${currentScale}_repeat${round}`
+            : `${pathPrefix}${currentModel}_${round}`;
         const roundData = {};
         let hasDataInRound = false;
         
@@ -437,7 +478,11 @@ async function loadSingleRunData() {
     const systemsData = {};
     for (const system of possibleSystems) {
         try {
-            const dataPath = `${getDataBasePath()}/${currentScenario}/metrics/${pathPrefix}${currentModel}/${system}.json`;
+            const scaleModel = scenarioData[currentScenario].scaleModelName || currentModel;
+            const folder = currentScale
+                ? `${pathPrefix}${scaleModel}_sf${currentScale}`
+                : `${pathPrefix}${currentModel}`;
+            const dataPath = `${getDataBasePath()}/${currentScenario}/metrics/${folder}/${system}.json`;
             const response = await fetch(dataPath);
             if (response.ok) {
                 const responseText = await response.text();
@@ -564,8 +609,9 @@ function populateTable() {
                          currentScenario === 'ecomm' ? 'E-commerce' :
                          currentScenario.charAt(0).toUpperCase() + currentScenario.slice(1);
     const modelName = scenarioData[currentScenario].modelNames[currentModel];
+    const scaleLabel = currentScale ? ` - Scale Factor ${currentScale}` : '';
     $('#tableTitle').html(`
-        ${scenarioName} Scenario - ${modelName}
+        ${scenarioName} Scenario - ${modelName}${scaleLabel}
         <br>
         <span id="tracesHint">
             <i>Click on query names in the first column (e.g., Q1) to see detailed results and implementation</i>
@@ -734,10 +780,8 @@ function createQueryInfoCell(queryId) {
 
 function getCostColorClass(cost, range) {
     if (range.max === range.min) {
-        // Single value case - use absolute thresholds
-        // Cost thresholds: < $0.01 = excellent, < $0.10 = good, >= $0.10 = poor
-        const baseClass = cost < 0.01 ? 'performance-excellent' :
-                         cost < 0.10 ? 'performance-good' : 'performance-poor';
+        // Single value: only one system has data, so it's the best by default
+        const baseClass = 'performance-excellent';
         return colorblindMode ? `${baseClass}-cb` : baseClass;
     }
     const normalized = (cost - range.min) / (range.max - range.min);
@@ -761,10 +805,8 @@ function getQualityColorClass(quality, range) {
 
 function getLatencyColorClass(latency, range) {
     if (range.max === range.min) {
-        // Single value case - use absolute thresholds
-        // Latency thresholds: < 5s = excellent, < 30s = good, >= 30s = poor
-        const baseClass = latency < 5 ? 'performance-excellent' :
-                         latency < 30 ? 'performance-good' : 'performance-poor';
+        // Single value: only one system has data, so it's the best by default
+        const baseClass = 'performance-excellent';
         return colorblindMode ? `${baseClass}-cb` : baseClass;
     }
     const normalized = (latency - range.min) / (range.max - range.min);
@@ -839,33 +881,28 @@ function calculateSystemSummary(systemData, summaryType) {
                 latencies.push(queryData.execution_time);
             }
 
-            // For std dev calculation - match Python's exact logic
+            // For std dev calculation - sum_var method:
+            // collect per-query variances (std^2), then sqrt(sum) / N
             if (summaryType === 'stddev') {
-                // Cost relative variance - check: not null AND not undefined AND > 0
                 const cost = queryData.money_cost;
                 const cost_std = queryData.money_cost_std;
                 if (cost !== null && cost !== undefined &&
-                    cost_std !== null && cost_std !== undefined &&
-                    cost > 0) {
-                    costVars.push(cost_std / cost);
+                    cost_std !== null && cost_std !== undefined) {
+                    costVars.push(cost_std * cost_std);
                 }
 
-                // Quality relative variance - use "accuracy" like Python, not getQualityMetric
                 const quality = queryData.accuracy;
                 const quality_std = queryData.quality_std;
                 if (quality !== null && quality !== undefined &&
-                    quality_std !== null && quality_std !== undefined &&
-                    quality > 0) {
-                    qualityVars.push(quality_std / quality);
+                    quality_std !== null && quality_std !== undefined) {
+                    qualityVars.push(quality_std * quality_std);
                 }
 
-                // Latency relative variance
                 const latency = queryData.execution_time;
                 const latency_std = queryData.execution_time_std;
                 if (latency !== null && latency !== undefined &&
-                    latency_std !== null && latency_std !== undefined &&
-                    latency > 0) {
-                    latencyVars.push(latency_std / latency);
+                    latency_std !== null && latency_std !== undefined) {
+                    latencyVars.push(latency_std * latency_std);
                 }
             }
         }
@@ -881,11 +918,19 @@ function calculateSystemSummary(systemData, summaryType) {
                     `${calculateMean(latencies).toFixed(2)}s`) : '--'
         };
     } else if (summaryType === 'stddev') {
-        // Return relative variance as percentages
+        // sum_var method: sqrt(sum of per-query variances) / N as absolute std dev
+        const costStd = costVars.length > 0 ?
+            Math.sqrt(costVars.reduce((a, b) => a + b, 0)) / costVars.length : null;
+        const qualityStd = qualityVars.length > 0 ?
+            Math.sqrt(qualityVars.reduce((a, b) => a + b, 0)) / qualityVars.length : null;
+        const latencyStd = latencyVars.length > 0 ?
+            Math.sqrt(latencyVars.reduce((a, b) => a + b, 0)) / latencyVars.length : null;
+
         return {
-            cost: costVars.length > 0 ? `±${(calculateMean(costVars) * 100).toFixed(1)}%` : '--',
-            quality: qualityVars.length > 0 ? `±${(calculateMean(qualityVars) * 100).toFixed(1)}%` : '--',
-            latency: latencyVars.length > 0 ? `±${(calculateMean(latencyVars) * 100).toFixed(1)}%` : '--'
+            cost: costStd !== null ? `±${formatCostStdDev(costStd)}` : '--',
+            quality: qualityStd !== null ? `±${qualityStd.toFixed(2)}` : '--',
+            latency: latencyStd !== null ?
+                (latencyStd >= 1 ? `±${latencyStd.toFixed(1)}s` : `±${latencyStd.toFixed(2)}s`) : '--'
         };
     }
 }
@@ -1259,6 +1304,21 @@ function formatCost(cost) {
     }
     
     return '$' + cost.toFixed(2);
+}
+
+function formatCostStdDev(cost) {
+    if (cost === 0 || cost === null || cost === undefined) {
+        return '$0.00';
+    }
+    if (Math.round(cost * 100) / 100 > 0) {
+        return '$' + cost.toFixed(2);
+    }
+    // Scientific notation for very small values: e.g. "$6×10⁻⁵"
+    const exp = Math.floor(Math.log10(Math.abs(cost)));
+    const base = Math.round(cost / Math.pow(10, exp));
+    const superscriptDigits = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻'};
+    const expStr = exp.toString().split('').map(c => superscriptDigits[c] || c).join('');
+    return `$${base}×10${expStr}`;
 }
 
 function formatCostWithError(meanCost, stdCost, hasMultipleRounds) {

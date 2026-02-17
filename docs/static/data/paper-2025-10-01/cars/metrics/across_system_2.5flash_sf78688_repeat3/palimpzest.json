@@ -1,0 +1,122 @@
+{
+  "Q1": {
+    "query_id": "1",
+    "status": "success",
+    "execution_time": 1885.634387254715,
+    "money_cost": 10.680487800000037,
+    "row_count": 6020,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20,
+    "precision": 0.6068106312292358,
+    "recall": 0.9545335772145284,
+    "f1_score": 0.7419518635117295
+  },
+  "Q10": {
+    "query_id": "10",
+    "status": "success",
+    "execution_time": 2432.782379388809,
+    "money_cost": 22.294509799999293,
+    "row_count": 78635,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20,
+    "precision": 0.5218086480195293,
+    "recall": 0.548339549059304,
+    "f1_score": 0.5035125970454762
+  },
+  "Q2": {
+    "query_id": "2",
+    "status": "success",
+    "execution_time": 12.544406652450562,
+    "money_cost": 0.019341000000000063,
+    "row_count": 5,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1_score": 0.0
+  },
+  "Q3": {
+    "query_id": "3",
+    "status": "success",
+    "execution_time": 9.43280816078186,
+    "money_cost": 0.010745999999999997,
+    "row_count": 10,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0
+  },
+  "Q4": {
+    "query_id": "4",
+    "status": "success",
+    "execution_time": 2057.6847898960114,
+    "money_cost": 10.562535300000096,
+    "row_count": 1,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20,
+    "relative_error": 0.005804275243546992,
+    "absolute_error": 0.0782443859595805,
+    "mean_absolute_percentage_error": 0.5804275243546991
+  },
+  "Q5": {
+    "query_id": "5",
+    "status": "success",
+    "execution_time": 12.499842882156372,
+    "money_cost": 0.04958850000000004,
+    "row_count": 1,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20,
+    "relative_error": 0.46153846153846156,
+    "absolute_error": 6.0,
+    "mean_absolute_percentage_error": 46.15384615384615
+  },
+  "Q6": {
+    "query_id": "6",
+    "status": "success",
+    "execution_time": 1455.2485783100128,
+    "money_cost": 10.17335829999875,
+    "row_count": 7651,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20,
+    "precision": 0.951117500980264,
+    "recall": 0.9773032500671501,
+    "f1_score": 0.9640325892561437
+  },
+  "Q7": {
+    "query_id": "7",
+    "status": "success",
+    "execution_time": 4857.826673269272,
+    "money_cost": 18.739918199998826,
+    "row_count": 35458,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20,
+    "precision": 0.40442213322804443,
+    "recall": 0.8974840405557641,
+    "f1_score": 0.557586126448402
+  },
+  "Q8": {
+    "query_id": "8",
+    "status": "success",
+    "execution_time": 1059.7701783180237,
+    "money_cost": 8.042492300000411,
+    "row_count": 100,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20,
+    "precision": 0.25,
+    "recall": 0.25,
+    "f1_score": 0.25
+  },
+  "Q9": {
+    "query_id": "9",
+    "status": "success",
+    "execution_time": 1065.2689094543457,
+    "money_cost": 8.144336700000903,
+    "row_count": 24,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20,
+    "precision": 0.041666666666666664,
+    "recall": 1.0,
+    "f1_score": 0.07999999999999999
+  }
+}

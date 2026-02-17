@@ -209,7 +209,7 @@
       <div class="columns is-centered">
         <div class="column has-text-justified">
           <div class="scenario-selection">
-            <h3 class="title is-3 has-text-centered">Select Version, Scenario and Model</h3>
+            <h3 class="title is-3 has-text-centered">Select Version, Scenario, Model, and Scale</h3>
             <div class="field is-grouped is-grouped-centered" style="margin-bottom: 2rem;">
               <div class="control">
                 <div class="select">
@@ -222,11 +222,11 @@
                 <div class="select">
                   <select id="scenarioSelect" disabled>
                     <option value="">Select Scenario</option>
-                    <option value="animals">Animals</option>
+                    <option value="animals">Wildlife</option>
                     <option value="movie">Movie</option>
                     <option value="ecomm">E-Commerce</option>
-                    <option value="medical">Medical</option>
                     <option value="mmqa">MMQA</option>
+                    <option value="cars">Cars</option>
                   </select>
                 </div>
               </div>
@@ -234,6 +234,13 @@
                 <div class="select">
                   <select id="modelSelect" disabled>
                     <option value="">Select Model</option>
+                  </select>
+                </div>
+              </div>
+              <div class="control">
+                <div class="select">
+                  <select id="scaleSelect" disabled>
+                    <option value="">Scale (Default)</option>
                   </select>
                 </div>
               </div>
@@ -329,6 +336,35 @@
     </div>
   </div>
 </section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-ninety">
+        <h2 class="title is-2">Scalability Experiments</h2>
+        <div class="content has-text-justified">
+          <p>
+            Scalability across scenarios. We report average execution time, monetary cost, result quality, and memory usage
+            over a fixed set of queries that are supported by all systems. Error bars for execution time, cost, and result
+            quality show standard deviations over five runs. For memory usage, error bars show the minimum and maximum values.
+            Cross markers indicate a per-query timeout of 1 hour. After a timeout, the system is treated as failed and is not
+            evaluated at larger scale factors. No timeout is applied in memory experiment to report the complete memory usage
+            at the largest scales.
+          </p>
+          <div class="has-text-centered" style="margin: 2rem 0;">
+            <img src="static/images/scalability_memory_combined.png"
+                 alt="Scalability and Memory Usage across Scenarios"
+                 style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 8px;"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <p style="display: none; color: #666; font-style: italic;">Scalability chart not available</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr style="margin: 0; border: none; border-top: 2px solid #dbdbdb;">
 
 <section class="section">
   <div class="container is-max-desktop">

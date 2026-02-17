@@ -1,0 +1,117 @@
+{
+  "Q1": {
+    "query_id": "1",
+    "status": "success",
+    "execution_time": 198.10360431671143,
+    "token_usage": 2682531,
+    "money_cost": 0.8696241,
+    "row_count": 506,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20,
+    "precision": 0.8517786561264822,
+    "recall": 0.9514348785871964,
+    "f1_score": 0.8988529718456726
+  },
+  "Q10": {
+    "query_id": "10",
+    "status": "success",
+    "execution_time": 216.6357970237732,
+    "token_usage": 4076227,
+    "money_cost": 1.5430560999999998,
+    "row_count": 9828,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20,
+    "precision": 0.4332906999127795,
+    "recall": 0.44597214501898463,
+    "f1_score": 0.42146876400764977
+  },
+  "Q2": {
+    "query_id": "2",
+    "status": "failed",
+    "error": "cannot import name 'AudioArray' from 'lotus.types' (/home/jl4492/miniconda3/envs/sembench/lib/python3.12/site-packages/lotus/types.py)",
+    "row_count": 0,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0
+  },
+  "Q3": {
+    "query_id": "3",
+    "status": "failed",
+    "error": "'vin'",
+    "row_count": 0,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20
+  },
+  "Q4": {
+    "query_id": "4",
+    "status": "success",
+    "execution_time": 183.29763960838318,
+    "token_usage": 2633391,
+    "money_cost": 0.8548821,
+    "row_count": 1,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20,
+    "relative_error": 0.026812357311800452,
+    "absolute_error": 0.3682008922096429,
+    "mean_absolute_percentage_error": 2.681235731180045
+  },
+  "Q5": {
+    "query_id": "5",
+    "status": "failed",
+    "error": "cannot import name 'ImageArray' from 'lotus.types' (/home/jl4492/miniconda3/envs/sembench/lib/python3.12/site-packages/lotus/types.py)",
+    "row_count": 0,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20,
+    "relative_error": 1.0,
+    "absolute_error": Infinity,
+    "mean_absolute_percentage_error": 100.0
+  },
+  "Q6": {
+    "query_id": "6",
+    "status": "failed",
+    "error": "cannot import name 'ImageArray' from 'lotus.types' (/home/jl4492/miniconda3/envs/sembench/lib/python3.12/site-packages/lotus/types.py)",
+    "row_count": 0,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1_score": 0.0
+  },
+  "Q7": {
+    "query_id": "7",
+    "status": "failed",
+    "error": "cannot import name 'ImageArray' from 'lotus.types' (/home/jl4492/miniconda3/envs/sembench/lib/python3.12/site-packages/lotus/types.py)",
+    "row_count": 0,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1_score": 0.0
+  },
+  "Q8": {
+    "query_id": "8",
+    "status": "success",
+    "execution_time": 1449.712266921997,
+    "token_usage": 2908132,
+    "money_cost": 0.8848476,
+    "row_count": 95,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20,
+    "precision": 0.4631578947368421,
+    "recall": 0.5789473684210527,
+    "f1_score": 0.5146198830409356
+  },
+  "Q9": {
+    "query_id": "9",
+    "status": "failed",
+    "error": "cannot import name 'ImageArray' from 'lotus.types' (/home/jl4492/miniconda3/envs/sembench/lib/python3.12/site-packages/lotus/types.py)",
+    "row_count": 0,
+    "model_name": "gemini-2.5-flash",
+    "concurrent_llm_worker": 20,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0
+  }
+}

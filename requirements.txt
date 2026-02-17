@@ -45,6 +45,7 @@ pypdf>=3.0.0
 pdf2image>=1.16.0
 python-dotenv>=1.0.0
 dirtyjson>=1.0.8
+gdown>=4.7.0
 
 # Web & API
 fastapi>=0.100.0

@@ -18,6 +18,9 @@ set -e  # Exit on any error
 # Configuration
 ENV_NAME="${1:-sembench}"  # Use first argument or default to 'sembench'
 
+# Disable conda plugins to avoid compatibility issues
+export CONDA_NO_PLUGINS=true
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -63,7 +66,7 @@ print_success "Conda found: $(conda --version)"
 
 print_step "Checking for existing '$ENV_NAME' environment..."
 
-if conda env list | grep -q "^$ENV_NAME "; then
+if CONDA_NO_PLUGINS=true conda env list | grep -q "^$ENV_NAME "; then
     print_warning "Existing '$ENV_NAME' environment found"
     read -p "Remove and recreate? (y/n) " -n 1 -r
     echo
@@ -83,7 +86,7 @@ fi
 
 print_step "Creating conda environment '$ENV_NAME' with Python 3.12..."
 
-conda create -n "$ENV_NAME" python=3.12 -y
+conda create -n "$ENV_NAME" python=3.12 -y --solver classic
 
 print_success "Environment created"
 
@@ -93,7 +96,7 @@ print_success "Environment created"
 
 print_step "Installing core scientific packages via conda..."
 
-conda install -n "$ENV_NAME" -c conda-forge -y \
+conda install -n "$ENV_NAME" -c conda-forge -y --solver classic \
     numpy \
     pandas \
     scikit-learn \
@@ -110,7 +113,7 @@ print_success "Core packages installed"
 
 print_step "Installing PyTorch with CUDA 12.4 support..."
 
-conda install -n "$ENV_NAME" -c pytorch -c nvidia -y \
+conda install -n "$ENV_NAME" -c pytorch -c nvidia -y --solver classic \
     pytorch \
     torchvision \
     torchaudio \
@@ -125,7 +128,7 @@ print_success "PyTorch with CUDA installed"
 print_step "Installing pip packages (handling version conflicts)..."
 
 # Get the conda environment path
-ENV_PATH=$(conda env list | grep "^$ENV_NAME " | awk '{print $NF}')
+ENV_PATH=$(CONDA_NO_PLUGINS=true conda env list | grep "^$ENV_NAME " | awk '{print $NF}')
 PIP_PATH="$ENV_PATH/bin/pip"
 
 # Install lotus-ai first (requires numpy<2.0.0)
@@ -145,6 +148,14 @@ print_step "Installing remaining packages..."
 grep -v "^lotus-ai" requirements.txt | grep -v "^palimpzest" > /tmp/requirements_temp.txt
 $PIP_PATH install -r /tmp/requirements_temp.txt
 rm /tmp/requirements_temp.txt
+
+# Install BigQuery dependencies
+print_step "Installing BigQuery dependencies..."
+$PIP_PATH install google-cloud-bigquery google-cloud-bigquery-storage google-cloud-storage 
+
+# Install remaining dependencies
+print_step "Installing other dependencies..."
+$PIP_PATH install dotenv overrides jinja2 db-dtypes duckdb tomli cdlib 
 
 print_success "All pip packages installed"
 

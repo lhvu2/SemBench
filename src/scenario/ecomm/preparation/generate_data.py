@@ -202,18 +202,6 @@ def _create_sample(target_dir: str, scale_factor: int, seed: int) -> str:
     duckdb.sql(
         f"""
         COPY (
-            SELECT styles_details.*
-            FROM read_parquet('{os.path.join(out_dir, 'styles.parquet')}') AS styles
-            JOIN read_parquet('{os.path.join(input_dir, 'styles_details.parquet')}') AS styles_details
-            ON styles_details.id = styles.id
-        )
-        TO '{os.path.join(out_dir, 'styles_details.parquet')}' (FORMAT PARQUET)
-    """
-    )
-
-    duckdb.sql(
-        f"""
-        COPY (
             SELECT image_mapping.*
             FROM read_parquet('{os.path.join(out_dir, 'styles.parquet')}') AS styles
             JOIN read_parquet('{os.path.join(input_dir, 'image_mapping.parquet')}') AS image_mapping
@@ -223,14 +211,46 @@ def _create_sample(target_dir: str, scale_factor: int, seed: int) -> str:
     """
     )
 
-    # Symlink necessary image files
+    # Symlink necessary image files (only if they actually exist)
     os.makedirs(os.path.join(out_dir, "images"), exist_ok=True)
     table = pq.read_table(os.path.join(out_dir, "image_mapping.parquet"))
-    for filename in table["filename"]:
+
+    valid_rows = []
+    missing_images = []
+
+    for i, filename in enumerate(table["filename"]):
         src = os.path.join(input_dir, "images", filename.as_py())
         dst = os.path.join(out_dir, "images", filename.as_py())
-        if not os.path.islink(dst) and not os.path.exists(dst):
-            os.symlink(os.path.realpath(src), dst)
+
+        # Only create symlink if source file actually exists
+        if os.path.exists(src):
+            if not os.path.islink(dst) and not os.path.exists(dst):
+                os.symlink(os.path.realpath(src), dst)
+            valid_rows.append(i)
+        else:
+            missing_images.append(filename.as_py())
+
+    if missing_images:
+        print(f"Warning: {len(missing_images)} images referenced in image_mapping but not found in source:")
+        print(f"  First few missing: {missing_images[:5]}")
+
+        # Filter image_mapping.parquet to only include rows with existing images
+        filtered_table = table.take(valid_rows)
+        pq.write_table(filtered_table, os.path.join(out_dir, "image_mapping.parquet"))
+        print(f"  Removed {len(missing_images)} missing images from image_mapping.parquet")
+
+    # Create styles_details.parquet AFTER filtering image_mapping to only include IDs with valid images
+    duckdb.sql(
+        f"""
+        COPY (
+            SELECT styles_details.*
+            FROM read_parquet('{os.path.join(out_dir, 'image_mapping.parquet')}') AS image_mapping
+            JOIN read_parquet('{os.path.join(input_dir, 'styles_details.parquet')}') AS styles_details
+            ON styles_details.id = image_mapping.id
+        )
+        TO '{os.path.join(out_dir, 'styles_details.parquet')}' (FORMAT PARQUET)
+    """
+    )
 
     return out_dir
 

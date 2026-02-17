@@ -144,6 +144,9 @@ class GenericLotusRunner(GenericRunner):
             print(
                 f"Warning: Unknown model '{self.model_name}', using default configuration"
             )
+            import os
+            base_config['api_key'] = os.environ["IBM_LITELLM_API_KEY"]
+            base_config['api_base'] = os.environ["IBM_LITELLM_URL"]
             return LM(self.model_name, **base_config)
 
     def _initialize_lotus_with_warmup(self):
@@ -158,8 +161,14 @@ class GenericLotusRunner(GenericRunner):
 
         for attempt in range(max_retries):
             try:
+                messages = [[
+                    {
+                        "role": "user",
+                        "content": "hi"
+                    }
+                ]]
                 # Make a simple test call to establish connection
-                self.lm.__call__(["hi"], show_progress_bar=False)
+                self.lm.__call__(messages=messages, show_progress_bar=False)
                 print(
                     f"LOTUS connection warmed up successfully on attempt {attempt + 1}"
                 )
@@ -250,7 +259,8 @@ class GenericLotusRunner(GenericRunner):
             metric.error = str(e)
             metric.results = self._get_empty_results_dataframe(query_id)
             print(f"  Error in Q{query_id} execution: {type(e).__name__}: {e}")
-            raise
+            import traceback
+            traceback.print_exc()
 
         finally:
             # Reset stats after storing

@@ -63,3 +63,9 @@ src/plot_scalability.py
 __MACOSX/
 
 figures/
+
+files/cars/data/all_car_audio/*
+files/cars/data/all_car_images/*
+files/cars/data/raw_data/*
+files/cars/data/source_data/*
+files/cars/data/full_data/*
