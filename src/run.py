@@ -248,7 +248,8 @@ Examples:
     parser.add_argument(
         "--queries",
         nargs="+",
-        default=None,
+        #default=None,
+        default=['1'],
         help="Specific query IDs to run (e.g., 1 5 or Q1 Q5). If not specified, runs all queries.",  # noqa: E501
     )
 
@@ -261,13 +262,15 @@ Examples:
     parser.add_argument(
         "--model",
         type=str,
-        default="gemini-2.5-flash",
+        #default="gemini-2.5-flash",
+        default="Azure/gpt-4o",
         help="Model name to use for systems that support it (default: gemini-2.5-flash)",
     )
 
     parser.add_argument(
         "--scale-factor",
         type=int,
+        default=2000,
         help="Factor to control the dataset size. Note that each use case has its own range for its respective scale factor.",  # noqa: E501
     )
 
